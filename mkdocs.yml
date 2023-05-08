@@ -1,0 +1,13 @@
+site_name: Analisador de baterias
+repo_url: https://github.com/Estacao-pilhas-pi2/battery-analyser
+repo_name: Estacao-pilhas-pi2/battery-analyser
+edit_uri: tree/main/docs
+
+theme:
+  name: "material"
+  language: pt-BR
+  logo: assets/logo.png
+  favicon: assets/logo.png
+
+extra_css:
+  - stylesheets/extra.css
