@@ -9,7 +9,7 @@ import keras.utils as kutils
 from pathlib import Path
 
 MODEL = load_model(Path(os.path.dirname(__file__)) / "model")
-IMAGE_SIZE = (128, 128)
+IMAGE_SIZE = (256, 256)
 
 
 class Battery(enum.Enum):
@@ -28,10 +28,9 @@ class Battery(enum.Enum):
 
     V9 = 0
     AA = 1
-    # AAA = 2
-    # C = 3
-    # D = 3
-    # UNKNOWN = 4
+    AAA = 2
+    D = 3
+    UNKNOWN = 4
 
 
 def predict(image_path: str) -> tuple[Battery, float]:
