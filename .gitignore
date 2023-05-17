@@ -179,3 +179,7 @@ pyrightconfig.json
 
 nohup.out
 .jupyter*
+
+*.jpg
+*.png
+
