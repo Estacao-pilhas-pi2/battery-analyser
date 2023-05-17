@@ -1,12 +1,14 @@
+import os
 import enum
 import random
 
 import numpy as np
 from keras.models import load_model
-from keras.preprocessing import image
+import keras.utils as kutils 
+from pathlib import Path
 
-# MODEL = load_model('model')
-IMAGE_SIZE = (64, 64)
+MODEL = load_model(Path(os.path.dirname(__file__)) / "model")
+IMAGE_SIZE = (256, 256)
 
 
 class Battery(enum.Enum):
@@ -26,9 +28,9 @@ class Battery(enum.Enum):
     V9 = 0
     AA = 1
     AAA = 2
-    C = 3
-    D = 4
-    UNKNOWN = 5
+    # C = 3
+    D = 3
+    UNKNOWN = 4
 
 
 def predict(image_path: str) -> tuple[Battery, float]:
@@ -47,15 +49,16 @@ def predict(image_path: str) -> tuple[Battery, float]:
         >>> predict('foto_aleatoria.jpg')
         (Battery.UNKNOWN, "0.5")
     """
-    # battery_image = _read_image(image_path)
-    # prediction = MODEL.predict(battery_image)
-    # return _format_prediction(prediction)
-    return Battery(random.randint(0, len(Battery) - 1)), '0.5'
+    battery_image = _read_image(image_path)
+    prediction = MODEL.predict(battery_image)
+    print(prediction)
+    return _format_prediction(prediction)
+    # return Battery(random.randint(0, len(Battery) - 1)), '0.5'
 
 
 def _read_image(image_path):
-    battery_image = image.load_img(image_path, target_size=IMAGE_SIZE)
-    battery_image = image.img_to_array(battery_image)
+    battery_image = kutils.load_img(image_path, target_size=IMAGE_SIZE)
+    battery_image = kutils.img_to_array(battery_image)
     battery_image = np.expand_dims(battery_image, axis=0)
     battery_image /= 255
     return battery_image
