@@ -1,0 +1,2 @@
+battery_analyser/model/ filter=lfs diff=lfs merge=lfs -text
+battery_analyser/model/** filter=lfs diff=lfs merge=lfs -text
