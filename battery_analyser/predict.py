@@ -5,7 +5,8 @@ import random
 import numpy as np
 import tensorflow as tf
 from keras.models import load_model
-import keras.utils as kutils 
+import keras.utils as kutils
+from typing import Dict,Tuple
 from pathlib import Path
 
 MODEL = load_model(Path(os.path.dirname(__file__)) / "model")
@@ -33,7 +34,7 @@ class Battery(enum.Enum):
     UNKNOWN = 4
 
 
-def predict(image_path: str) -> tuple[Battery, float]:
+def predict(image_path: str) -> Tuple[Battery, float]:
     """
     Classifica uma imagem de uma bateria
 
