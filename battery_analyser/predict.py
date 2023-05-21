@@ -34,7 +34,32 @@ class Battery(enum.Enum):
     UNKNOWN = 4
 
 
-def predict(image_path: str) -> Tuple[Battery, float]:
+Predicton = Tuple[Battery, float]
+
+
+def predict(image: np.ndarray) -> Predicton:
+    """
+    Classifica uma imagem de uma bateria
+
+    Args:
+        image: Array de bytes de 3 dimensões com a imagem
+
+    Returns:
+        Uma Predicton com a classificação da bateria e a porcentagem da predição.
+
+    Examples:
+        >>> predict('caminho_bateria_tipo_aaa.png')
+        (Battery.AAA, "0.5")
+        >>> predict('foto_aleatoria.jpg')
+        (Battery.UNKNOWN, "0.5")
+    """
+    image = tf.expand_dims(image, 0)
+    image /= 255
+    prediction = MODEL.predict(image)
+    return _format_prediction(prediction)
+
+
+def predict_from_path(image_path: str) -> Predicton:
     """
     Classifica uma imagem de uma bateria
 
@@ -42,7 +67,7 @@ def predict(image_path: str) -> Tuple[Battery, float]:
         image_path: Caminho para a imagem da bateria
 
     Returns:
-        Uma tupla com a classificação da bateria e a porcentagem da predição.
+        Uma Predicton com a classificação da bateria e a porcentagem da predição.
 
     Examples:
         >>> predict('caminho_bateria_tipo_aaa.png')
@@ -51,16 +76,12 @@ def predict(image_path: str) -> Tuple[Battery, float]:
         (Battery.UNKNOWN, "0.5")
     """
     battery_image = _read_image(image_path)
-    prediction = MODEL.predict(battery_image)
-    # return Battery(random.randint(0, len(Battery) - 1)), '0.5'
-    return _format_prediction(prediction)
+    return predict(battery_image)
 
 
 def _read_image(image_path):
     battery_image = kutils.load_img(image_path, target_size=IMAGE_SIZE)
     battery_image = kutils.img_to_array(battery_image)
-    battery_image = tf.expand_dims(battery_image, 0)
-    battery_image /= 255
     return battery_image
 
 
@@ -69,4 +90,4 @@ def _format_prediction(prediction):
     result_indice = np.argmax(score)
     category = Battery(result_indice)
     percentage = np.max(score) * 100
-    return category, f'{percentage:.2f}'
+    return category, f'{percentage:.2f}%'
