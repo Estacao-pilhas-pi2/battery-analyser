@@ -1,16 +1,18 @@
 import os
 import enum
-import random
 
-import numpy as np
-import tensorflow as tf
-from keras.models import load_model
-import keras.utils as kutils
-from typing import Dict,Tuple
 from pathlib import Path
 
-MODEL = load_model(Path(os.path.dirname(__file__)) / "model")
-IMAGE_SIZE = (256, 256)
+import numpy as np
+
+from tflite_support.task import core
+from tflite_support.task import processor
+from tflite_support.task import vision
+
+
+MODEL = str(Path(os.path.dirname(__file__)) / "model.tflite")
+NUM_THREADS = int(os.environ.get("ANALYSER_NUM_THREADS", "2"))
+WIDTH, HEIGHT = IMAGE_SIZE = (256, 256)
 
 
 class Battery(enum.Enum):
@@ -34,10 +36,18 @@ class Battery(enum.Enum):
     UNKNOWN = 4
 
 
-Predicton = Tuple[Battery, float]
+base_options = core.BaseOptions(
+    file_name=MODEL, num_threads=NUM_THREADS)
+
+classification_options = processor.ClassificationOptions(max_results=1)
+
+options = vision.ImageClassifierOptions(
+    base_options=base_options, classification_options=classification_options)
+
+classifier = vision.ImageClassifier.create_from_options(options)
 
 
-def predict(image: np.ndarray) -> Predicton:
+def predict(image: np.ndarray) -> Battery:
     """
     Classifica uma imagem de uma bateria
 
@@ -46,48 +56,7 @@ def predict(image: np.ndarray) -> Predicton:
 
     Returns:
         Uma Predicton com a classificação da bateria e a porcentagem da predição.
-
-    Examples:
-        >>> predict('caminho_bateria_tipo_aaa.png')
-        (Battery.AAA, "0.5")
-        >>> predict('foto_aleatoria.jpg')
-        (Battery.UNKNOWN, "0.5")
     """
-    image = tf.expand_dims(image, 0)
-    image /= 255
-    prediction = MODEL.predict(image)
-    return _format_prediction(prediction)
-
-
-def predict_from_path(image_path: str) -> Predicton:
-    """
-    Classifica uma imagem de uma bateria
-
-    Args:
-        image_path: Caminho para a imagem da bateria
-
-    Returns:
-        Uma Predicton com a classificação da bateria e a porcentagem da predição.
-
-    Examples:
-        >>> predict('caminho_bateria_tipo_aaa.png')
-        (Battery.AAA, "0.5")
-        >>> predict('foto_aleatoria.jpg')
-        (Battery.UNKNOWN, "0.5")
-    """
-    battery_image = _read_image(image_path)
-    return predict(battery_image)
-
-
-def _read_image(image_path):
-    battery_image = kutils.load_img(image_path, target_size=IMAGE_SIZE)
-    battery_image = kutils.img_to_array(battery_image)
-    return battery_image
-
-
-def _format_prediction(prediction):
-    score = tf.nn.softmax(prediction[0])
-    result_indice = np.argmax(score)
-    category = Battery(result_indice)
-    percentage = np.max(score) * 100
-    return category, f'{percentage:.2f}%'
+    tensor_image = vision.TensorImage.create_from_array(image)
+    categories = classifier.classify(tensor_image)
+    return Battery(categories.classifications[0].categories[0].index)

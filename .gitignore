@@ -183,3 +183,5 @@ nohup.out
 *.jpg
 *.png
 
+models/
+dataset_*/
