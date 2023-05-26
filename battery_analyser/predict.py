@@ -59,4 +59,6 @@ def predict(image: np.ndarray) -> Battery:
     """
     tensor_image = vision.TensorImage.create_from_array(image)
     categories = classifier.classify(tensor_image)
+    if not categories.classifications or not categories.classifications[0].categories:
+        return None
     return Battery(categories.classifications[0].categories[0].index)

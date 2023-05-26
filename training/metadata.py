@@ -2,11 +2,11 @@ from tflite_support.metadata_writers import image_classifier
 from tflite_support.metadata_writers import writer_utils
 
 ImageClassifierWriter = image_classifier.MetadataWriter
-_MODEL_PATH = "models/model_w256_e100_2023-05-25T22:49:15.652421.tflite"
+_MODEL_PATH = "models/model_w256_e100_2023-05-26T01:37:03.525054.tflite"
 _LABEL_FILE = "models/labels"
-_SAVE_TO_PATH = "models/model_w256_e100_2023-05-25T22:49:15.652421_final.tflite"
+_SAVE_TO_PATH = "models/model.tflite"
 
-_INPUT_NORM_MEAN = 127.5
+_INPUT_NORM_MEAN = 0
 _INPUT_NORM_STD = 127.5
 
 # Create the metadata writer.
