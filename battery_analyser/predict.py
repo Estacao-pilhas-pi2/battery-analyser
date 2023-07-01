@@ -32,8 +32,9 @@ class Battery(enum.Enum):
     V9 = 0
     AA = 1
     AAA = 2
-    D = 3
-    UNKNOWN = 4
+    C = 3
+    D = 4
+    UNKNOWN = 5
 
 
 base_options = core.BaseOptions(
