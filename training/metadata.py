@@ -1,8 +1,9 @@
+import sys
 from tflite_support.metadata_writers import image_classifier
 from tflite_support.metadata_writers import writer_utils
 
 ImageClassifierWriter = image_classifier.MetadataWriter
-_MODEL_PATH = "models/model_w256_e100_2023-05-26T01:37:03.525054.tflite"
+_MODEL_PATH = sys.argv[1]
 _LABEL_FILE = "models/labels"
 _SAVE_TO_PATH = "models/model.tflite"
 

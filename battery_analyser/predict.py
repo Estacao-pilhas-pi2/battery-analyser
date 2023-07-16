@@ -13,6 +13,7 @@ from tflite_support.task import vision
 MODEL = str(Path(os.path.dirname(__file__)) / "model.tflite")
 NUM_THREADS = int(os.environ.get("ANALYSER_NUM_THREADS", "2"))
 WIDTH, HEIGHT = IMAGE_SIZE = (256, 256)
+THRESHOLD = float(os.environ.get("ANALYSER_THRESHOLD", "15"))
 
 
 class Battery(enum.Enum):
@@ -40,7 +41,7 @@ class Battery(enum.Enum):
 base_options = core.BaseOptions(
     file_name=MODEL, num_threads=NUM_THREADS)
 
-classification_options = processor.ClassificationOptions(max_results=1)
+classification_options = processor.ClassificationOptions(max_results=1, score_threshold=0.2)
 
 options = vision.ImageClassifierOptions(
     base_options=base_options, classification_options=classification_options)
@@ -60,6 +61,6 @@ def predict(image: np.ndarray) -> Battery:
     """
     tensor_image = vision.TensorImage.create_from_array(image)
     categories = classifier.classify(tensor_image)
-    if not categories.classifications or not categories.classifications[0].categories:
-        return None
+    if not categories.classifications or not categories.classifications[0].categories or categories.classifications[0].categories[0].score < THRESHOLD:
+        return Battery.UNKNOWN
     return Battery(categories.classifications[0].categories[0].index)
